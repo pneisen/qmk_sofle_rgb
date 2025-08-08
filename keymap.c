@@ -1,5 +1,27 @@
 #include QMK_KEYBOARD_H
 
+#define INDICATOR_BRIGHTNESS 30
+
+#define HSV_OVERRIDE_HELP(h, s, v, Override) h, s , Override
+#define HSV_OVERRIDE(hsv, Override) HSV_OVERRIDE_HELP(hsv,Override)
+
+// Light combinations
+#define SET_INDICATORS(hsv) \
+	{0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
+	{36+0, 1, hsv}
+#define SET_UNDERGLOW(hsv) \
+	{1, 6, hsv}, \
+	{36+1, 6,hsv}
+#define SET_NUMPAD(hsv)     \
+	{36+15, 5, hsv},\
+	{36+22, 3, hsv},\
+	{3j+27, 3, hsv}
+#define SET_LAYER_ID(hsv) 	\
+	{0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
+	{36+0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
+	{1, 6, hsv}, \
+	{36+1, 6, hsv}
+
 enum sofle_layers {
     _BASE,
     _LOWER,
@@ -109,4 +131,45 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 
 };
+
+#ifdef RGBLIGHT_ENABLE
+char layer_state_str[70];
+
+// Base
+const rgblight_segment_t PROGMEM layer_base_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_TEAL));
+
+// Lower
+const rgblight_segment_t PROGMEM layer_lower_lights[] = RGBLIGHT_LAYER_SEGMENTS(
+	SET_INDICATORS(HSV_BLUE),
+	SET_UNDERGLOW(HSV_BLUE),
+	SET_NUMPAD(HSV_BLUE)
+);
+
+// Raise
+const rgblight_segment_t PROGMEM layer_raise_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_GREEN));
+
+// FN
+const rgblight_segment_t PROGMEM layer_fn_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_RED));
+
+const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
+	layer_base_lights,
+	layer_lower_lights,
+	layer_raise_lights,
+	layer_fn_lights
+);
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+	rgblight_set_layer_state(0, layer_state_cmp(state, _BASE));
+	rgblight_set_layer_state(1, layer_state_cmp(state, _LOWER));
+	rgblight_set_layer_state(2, layer_state_cmp(state, _RAISE));
+	rgblight_set_layer_state(3, layer_state_cmp(state, _FN));
+
+    	return state;
+}
+
+void keyboard_post_init_user(void) {
+	rgblight_sethsv(HSV_OFF);
+	rgblight_layers = my_rgb_layers;
+}
+#endif
 
