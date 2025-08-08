@@ -12,10 +12,9 @@
 #define SET_UNDERGLOW(hsv) \
 	{1, 6, hsv}, \
 	{36+1, 6,hsv}
-#define SET_NUMPAD(hsv)     \
-	{36+15, 5, hsv},\
-	{36+22, 3, hsv},\
-	{3j+27, 3, hsv}
+#define SET_NUMPAD(hsv) \
+	{36+16, 1, hsv}, \
+	{36+23, 3, hsv}
 #define SET_LAYER_ID(hsv) 	\
 	{0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
 	{36+0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
@@ -136,7 +135,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 char layer_state_str[70];
 
 // Base
-const rgblight_segment_t PROGMEM layer_base_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_TEAL));
+const rgblight_segment_t PROGMEM layer_base_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_CYAN));
 
 // Lower
 const rgblight_segment_t PROGMEM layer_lower_lights[] = RGBLIGHT_LAYER_SEGMENTS(
@@ -146,7 +145,7 @@ const rgblight_segment_t PROGMEM layer_lower_lights[] = RGBLIGHT_LAYER_SEGMENTS(
 );
 
 // Raise
-const rgblight_segment_t PROGMEM layer_raise_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_GREEN));
+const rgblight_segment_t PROGMEM layer_raise_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_AZURE));
 
 // FN
 const rgblight_segment_t PROGMEM layer_fn_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_RED));
@@ -168,8 +167,59 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 void keyboard_post_init_user(void) {
+	// Set the solid color effect (on by default) to off.
 	rgblight_sethsv(HSV_OFF);
+
 	rgblight_layers = my_rgb_layers;
+}
+#endif
+
+#ifdef OLED_ENABLE
+static void render_logo(void) {
+    static const char PROGMEM qmk_logo[] = {
+        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94,
+        0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3, 0xB4,
+        0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0x00
+    };
+
+    oled_write_P(qmk_logo, false);
+}
+
+static void print_status_narrow(void) {
+	oled_write_P(PSTR("\n\n"), false);
+	oled_write_P(PSTR("LAYER:\n"), false);
+
+	switch (get_highest_layer(layer_state)) {
+		case _LOWER:
+			oled_write_P(PSTR("Lower"), false);
+           		break;
+		case _RAISE:
+            		oled_write_P(PSTR("Raise"), false);
+           		break;
+    		case _FN:
+        		oled_write_P(PSTR(" Fn  "), false);
+            		break;
+        	default:
+            		oled_write_P(PSTR(" Base"), false);
+    	}
+    	oled_write_P(PSTR("\n\n"), false);
+    	oled_write_P(PSTR("Sofle\n  RBG"), false);
+}
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    if (is_keyboard_master()) {
+        return OLED_ROTATION_270;
+    }
+    return rotation;
+}
+
+bool oled_task_user(void) {
+    if (is_keyboard_master()) {
+        print_status_narrow();
+    } else {
+        render_logo();
+    }
+    return false;
 }
 #endif
 
