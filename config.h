@@ -1,1 +1,15 @@
 #pragma once
+
+#define SPLIT_USB_DETECT
+
+#define QUICK_TAP_TERM 0
+#ifdef TAPPING_TERM
+    #undef TAPPING_TERM
+    #define TAPPING_TERM 200
+#endif
+
+#define RGBLIGHT_SLEEP
+#define RGBLIGHT_LAYERS
+
+#undef RGBLIGHT_LED_COUNT
+#define RGBLIGHT_LED_COUNT 72
