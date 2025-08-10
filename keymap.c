@@ -3,21 +3,33 @@
 #define INDICATOR_BRIGHTNESS 30
 
 #define HSV_OVERRIDE_HELP(h, s, v, Override) h, s , Override
-#define HSV_OVERRIDE(hsv, Override) HSV_OVERRIDE_HELP(hsv,Override)
+// #define HSV_OVERRIDE(hsv, Override) HSV_OVERRIDE_HELP(hsv,Override)
+
+// Light colors
+#define BASE_COLOR  HSV_CYAN
+#define LOWER_COLOR HSV_BLUE
+#define RAISE_COLOR 185, 255, 255
+#define FN_COLOR    HSV_WHITE
 
 // Light combinations
 #define SET_INDICATORS(hsv) \
 	{0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
-	{36+0, 1, hsv}
+	{36, 1, hsv}
 #define SET_UNDERGLOW(hsv) \
 	{1, 6, hsv}, \
 	{36+1, 6,hsv}
+#define SET_ARROWS(hsv) \
+	{36+16, 2, hsv}, \
+	{36+7, 1, hsv}, \
+	{36+25, 1, hsv}
 #define SET_NUMPAD(hsv) \
 	{36+16, 1, hsv}, \
-	{36+23, 3, hsv}
+	{36+18, 3, hsv}, \
+	{36+23, 3, hsv}, \
+	{36+28, 3, hsv}
 #define SET_LAYER_ID(hsv) 	\
 	{0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
-	{36+0, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
+	{36, 1, HSV_OVERRIDE_HELP(hsv, INDICATOR_BRIGHTNESS)}, \
 	{1, 6, hsv}, \
 	{36+1, 6, hsv}
 
@@ -135,20 +147,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 char layer_state_str[70];
 
 // Base
-const rgblight_segment_t PROGMEM layer_base_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_CYAN));
+const rgblight_segment_t PROGMEM layer_base_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(BASE_COLOR));
 
 // Lower
 const rgblight_segment_t PROGMEM layer_lower_lights[] = RGBLIGHT_LAYER_SEGMENTS(
-	SET_INDICATORS(HSV_BLUE),
-	SET_UNDERGLOW(HSV_BLUE),
-	SET_NUMPAD(HSV_BLUE)
+	SET_INDICATORS(LOWER_COLOR),
+	SET_UNDERGLOW(LOWER_COLOR),
+	SET_NUMPAD(LOWER_COLOR)
 );
 
 // Raise
-const rgblight_segment_t PROGMEM layer_raise_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_AZURE));
+const rgblight_segment_t PROGMEM layer_raise_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(RAISE_COLOR));
 
 // FN
-const rgblight_segment_t PROGMEM layer_fn_lights[] = RGBLIGHT_LAYER_SEGMENTS(SET_LAYER_ID(HSV_WHITE));
+const rgblight_segment_t PROGMEM layer_fn_lights[] = RGBLIGHT_LAYER_SEGMENTS(
+	SET_INDICATORS(FN_COLOR),
+	SET_UNDERGLOW(FN_COLOR),
+	SET_ARROWS(FN_COLOR)
+);
 
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
 	layer_base_lights,
